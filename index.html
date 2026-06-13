@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilgitop TV</title>
+    <title>Bilgitop TV - Canlı Yayın</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
         body {
-            background-color: #111;
+            background-color: #0f0f12;
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -17,16 +17,45 @@
             align-items: center;
         }
         header {
-            background-color: #222;
+            background-color: #1a1a24;
             width: 100%;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 15px 0;
-            font-size: 24px;
-            font-weight: bold;
             border-bottom: 3px solid #ff4757;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
         }
+        
+        /* 🇦🇿 AZERBAYCAN BAYRAKLI LOGO TASARIMI (KODLA ÇİZİLEN) */
+        .az-logo-badge {
+            display: inline-flex;
+            flex-direction: column;
+            width: 180px;
+            height: 55px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .stripe-blue { background: #0092bc; width: 100%; height: 33.33%; }
+        .stripe-red { background: #e3001b; width: 100%; height: 33.33%; }
+        .stripe-green { background: #009775; width: 100%; height: 33.33%; }
+        .logo-text-overlay {
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            /* Yazının şeritler üstünde net okunması için kalın siyah gölge */
+            text-shadow: 2px 2px 4px rgba(0,0,0,1), -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            font-family: 'Arial Black', Gadget, sans-serif;
+            text-transform: uppercase;
+        }
+        
         .container {
             width: 100%;
             max-width: 800px;
@@ -39,87 +68,244 @@
             background: #000;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .video-js {
             width: 100% !important;
             height: auto;
             aspect-ratio: 16/9;
         }
-        .channel-list {
-            margin-top: 25px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            width: 100%;
+        
+        /* 📺 VİDEO ÜZERİNDEKİ CANLI YAYIN LOGOSU (AMBLEM) */
+        .tv-watermark {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 110px;
+            height: 34px;
+            z-index: 9;
+            opacity: 0.75; /* Gerçek TV'lerdeki gibi hafif şeffaf */
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .channel-btn {
-            background: #2f3542;
-            color: white;
-            border: none;
+        .tv-watermark .logo-text-overlay {
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .current-program {
+            background: #1a1a24;
             padding: 15px;
-            font-size: 16px;
-            font-weight: 600;
+            margin-top: 15px;
             border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-left: 5px solid #ff4757;
+            font-size: 18px;
+            font-weight: bold;
         }
-        .channel-btn:hover, .channel-btn.active {
+        .schedule-container {
+            margin-top: 25px;
+            background: #1a1a24;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .schedule-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            color: #ff4757;
+        }
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #252533;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .schedule-item.active {
             background: #ff4757;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
         }
-        @media (max-width: 600px) {
-            header { font-size: 20px; padding: 10px 0; }
-            .container { padding: 10px; }
-            .channel-btn { padding: 12px; font-size: 14px; }
+        .live-badge {
+            background: white;
+            color: #ff4757;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            animation: blink 1.5s infinite;
         }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        #off-air-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #1a1a24;
+            border: 2px dashed #ff4757;
+            border-radius: 12px;
+            padding: 50px 20px;
+            margin-top: 20px;
+        }
+        #off-air-screen h2 { color: #ff4757; }
     </style>
 </head>
 <body>
 
-    <header>📺 BİLGİTOP TV</header>
+    <header>
+        <div class="az-logo-badge">
+            <div class="stripe-blue"></div>
+            <div class="stripe-red"></div>
+            <div class="stripe-green"></div>
+            <div class="logo-text-overlay">Bilgitop TV</div>
+        </div>
+    </header>
 
     <div class="container">
-        <div class="video-container">
-            <video id="tv-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}'>
-                <p class="vjs-no-js">Videoyu izlemek için JavaScript'i etkinleştirin.</p>
-            </video>
+        <div id="on-air-content">
+            <div class="video-container">
+                
+                <div class="az-logo-badge tv-watermark">
+                    <div class="stripe-blue"></div>
+                    <div class="stripe-red"></div>
+                    <div class="stripe-green"></div>
+                    <div class="logo-text-overlay">Bilgitop TV</div>
+                </div>
+                
+                <video id="tv-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup='{}'>
+                    <p class="vjs-no-js">Videoyu izlemek için JavaScript'i etkinleştirin.</p>
+                </video>
+            </div>
+            <div class="current-program" id="live-program-title">Şu An Yayında: Yükleniyor...</div>
         </div>
 
-        <div class="channel-list">
-            <button class="channel-btn active" onclick="changeChannel('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', this)">🍿 Sinema Test</button>
-            <button class="channel-btn" onclick="changeChannel('https://demo.unified-streaming.com/kaltura/the-daily-show/playlist.m3u8', this)">🎬 Dizi Test</button>
-            <button class="channel-btn" onclick="changeChannel('https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8', this)">🎵 Müzik Test</button>
+        <div id="off-air-screen">
+            <h2>🌙 YAYINIMIZ SONA ERMİŞTİR</h2>
+            <p id="closing-text">Yayın akışımız her gün sabah saat 09:00'da başlar.</p>
+        </div>
+
+        <div class="schedule-container">
+            <div class="schedule-title" id="schedule-day-title">Bugün Yayın Akışı</div>
+            <div class="schedule-list" id="schedule-list-ui">
+                </div>
         </div>
     </div>
 
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
     <script>
         var player = videojs('tv-player');
+        var currentPlayingUrl = "";
+
+        // HAFTALIK YAYIN AKIŞI OTOMASYONU
+        const YAYIN_AKISLARI = {
+            1: [
+                { start: "09:00", end: "09:45", title: "Sabah Haberleri", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+                { start: "09:45", end: "09:55", title: "Kısa Ara & Reklamlar", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "09:55", end: "11:00", title: "Belgesel Kuşağı", url: "https://cph-p2p-msl.akamaized.net/hls/live/2006723/cph/master.m3u8" },
+                { start: "11:00", end: "11:05", title: "Kısa Ara & Reklamlar", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "11:05", end: "11:15", title: "Bilgitop Kids (Telifsiz Film - Bölüm 1)", url: "https://live.unified-streaming.com/sintel/sintel.isml/.m3u8" },
+                { start: "11:15", end: "11:20", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "11:20", end: "11:40", title: "Bilgitop Kids (Telifsiz Film - Bölüm 2)", url: "https://live.unified-streaming.com/sintel/sintel.isml/.m3u8" },
+                { start: "11:40", end: "11:45", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "11:45", end: "12:00", title: "Bilgitop Kids (Çocuk Haberleri)", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+                { start: "12:00", end: "12:05", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "12:05", end: "12:30", title: "Bilgitop Kids (İlkokul Ders Anlatımı)", url: "https://cph-p2p-msl.akamaized.net/hls/live/2006723/cph/master.m3u8" },
+                { start: "12:30", end: "12:40", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "12:40", end: "13:00", title: "Bilgitop Kids (Bizim Yapacağımız Dizi)", url: "https://live.unified-streaming.com/sintel/sintel.isml/.m3u8" },
+                { start: "13:00", end: "13:10", title: "Reklamlar & Tanıtımlar", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "13:10", end: "13:15", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "13:15", end: "14:00", title: "Ortaokul Ders-Konu Anlatımı", url: "https://cph-p2p-msl.akamaized.net/hls/live/2006723/cph/master.m3u8" },
+                { start: "14:00", end: "15:00", title: "Lise Ders-Konu Anlatımı", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+                { start: "15:00", end: "17:00", title: "Sinema Kuşağı (Telifsiz)", url: "https://live.unified-streaming.com/sintel/sintel.isml/.m3u8" },
+                { start: "17:00", end: "17:05", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "17:05", end: "20:00", title: "Bütün Haberler (Ana Haber)", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+                { start: "20:00", end: "20:05", title: "Kısa Ara", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" },
+                { start: "20:05", end: "23:55", title: "Music & Gece Modu", url: "https://cph-p2p-msl.akamaized.net/hls/live/2006723/cph/master.m3u8" },
+                { start: "23:55", end: "00:00", title: "Kapanış ve Yarının Yayın Akışı", url: "https://playertest.longtailvideo.com/adaptive/bipbop/bipbop.m3u8" }
+            ],
+            2: [], 3: [], 4: [], 5: [], 6: [], 0: []
+        };
         
-        player.src({
-            src: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-            type: 'application/x-mpegURL'
-        });
+        for(let i=0; i<=6; i++) { if(YAYIN_AKISLARI[i].length === 0) YAYIN_AKISLARI[i] = YAYIN_AKISLARI[1]; }
+        const GUN_ISIMLERI = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
 
-        function changeChannel(url, element) {
-            var buttons = document.getElementsByClassName('channel-btn');
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('active');
+        function otomasyonuCalistir() {
+            var simdi = new Date();
+            var bugunKodu = simdi.getDay();
+            var saat = simdi.getHours();
+            var dakika = simdi.getMinutes();
+            var toplamDakika = (saat * 60) + dakika;
+            var bugunkuAkis = YAYIN_AKISLARI[bugunKodu];
+            var aktifProgram = null;
+            
+            document.getElementById('schedule-day-title').innerText = "Bugün Yayın Akışı (" + GUN_ISIMLERI[bugunKodu] + ")";
+
+            for (var i = 0; i < bugunkuAkis.length; i++) {
+                var p = bugunkuAkis[i];
+                var startParts = p.start.split(":");
+                var endParts = p.end.split(":");
+                var startMin = (parseInt(startParts[0]) * 60) + parseInt(startParts[1]);
+                var endMin = (parseInt(endParts[0]) * 60) + parseInt(endParts[1]);
+                
+                if (toplamDakika >= startMin && toplamDakika < endMin) {
+                    aktifProgram = p;
+                    aktifProgram.index = i;
+                    break;
+                }
             }
-            element.classList.add('active');
 
-            player.src({
-                src: url,
-                type: 'application/x-mpegURL'
+            var listUi = document.getElementById('schedule-list-ui');
+            listUi.innerHTML = "";
+            
+            bugunkuAkis.forEach(function(prog, idx) {
+                var item = document.createElement('div');
+                item.className = "schedule-item";
+                if(aktifProgram && aktifProgram.index === idx) {
+                    item.className += " active";
+                    item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span class='live-badge'>● CANLI</span>";
+                } else {
+                    item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span style='color:#aaa; font-size:13px;'>" + prog.end + "</span>";
+                }
+                listUi.appendChild(item);
             });
-            player.play().catch(function(error) {
-                console.log("Oynatılamadı.");
-            });
+
+            if (aktifProgram) {
+                document.getElementById('on-air-content').style.display = 'block';
+                document.getElementById('off-air-screen').style.display = 'none';
+                document.getElementById('live-program-title').innerHTML = "📺 Şu An Yayında: <span style='color:#ff4757;'>" + aktifProgram.title + "</span> (" + aktifProgram.start + " - " + aktifProgram.end + ")";
+                
+                if (currentPlayingUrl !== aktifProgram.url) {
+                    currentPlayingUrl = aktifProgram.url;
+                    player.src({ src: aktifProgram.url, type: 'application/x-mpegURL' });
+                    player.play().catch(function(e){ console.log("Oynatma bekleniyor.."); });
+                }
+            } else {
+                document.getElementById('on-air-content').style.display = 'none';
+                document.getElementById('off-air-screen').style.display = 'flex';
+                player.pause();
+                currentPlayingUrl = "";
+            }
         }
+
+        otomasyonuCalistir();
+        setInterval(otomasyonuCalistir, 15000);
     </script>
 </body>
 </html>
