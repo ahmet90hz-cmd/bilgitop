@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilgitop TV - Canlı Yayın</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff3333;
+            margin-bottom: 5px;
+        }
+        .studio {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.2);
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .current-program {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #222;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📺 BILGITOP TV</h1>
+    <div class="studio">Bilgitop Studios Sunar</div>
+
+    <div class="video-container">
+        <div id="player"></div>
+    </div>
+
+    <div class="current-program" id="program-adi">Yayın Hazırlanıyor...</div>
+</div>
+
+<script>
+    // 1. YAYIN AKIŞI LİSTESİ (Burayı istediğin gibi düzenle)
+    // ÖNEMLİ: YouTube video ID'lerini (v= kısmından sonraki kod) yazmalısın.
+    const yayinAkisi = [
+        { baslangic: "00:00", sureDk: 60, id: "dQw4w9WgXcQ", isim: "Gece Kuşağı: Bilgitop Belgeseli" },
+        { baslangic: "01:00", sureDk: 120, id: "kJQP7kiw5Fk", isim: "Korku Saati: Horrorcraft Özel" },
+        { baslangic: "09:00", sureDk: 30, id: "dQw4w9WgXcQ", isim: "Sabah Haberleri ve Bilgi Topu" },
+        { baslangic: "12:00", sureDk: 45, id: "kJQP7kiw5Fk", isim: "Öğle Arası: Erdem Gamer ile Oyun Dünyası" },
+        { baslangic: "18:00", sureDk: 60, id: "dQw4w9WgXcQ", isim: "Ana Haber Bülteni" },
+        { baslangic: "20:00", sureDk: 120, id: "kJQP7kiw5Fk", isim: "Akşam Sineması: Bilgitop Studios Özel Yapımı" }
+    ];
+
+    // YouTube API'sinin yüklenmesi
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    function onYouTubeIframeAPIReady() {
+        yayinYonetmeni();
+    }
+
+    function yayinYonetmeni() {
+        const simdi = new Date();
+        const suAnkiDakika = simdi.getHours() * 60 + simdi.getMinutes();
+        const suAnkiSaniye = simdi.getSeconds();
+
+        let aktifYayin = null;
+        let baslangicSaniyesi = 0;
+
+        // Akıştaki hangi videonun saatine denk geldiğimizi buluyoruz
+        for (let program of yayinAkisi) {
+            const [saat, dk] = program.baslangic.split(":").map(Number);
+            const progBaslangicDakika = saat * 60 + dk;
+            const progBitisDakika = progBaslangicDakika + program.sureDk;
+
+            if (suAnkiDakika >= progBaslangicDakika && suAnkiDakika < progBitisDakika) {
+                aktifYayin = program;
+                // Videonun tam olarak kaçıncı saniyesinden başlaması gerektiğini hesaplıyoruz
+                const gecenDakika = suAnkiDakika - progBaslangicDakika;
+                baslangicSaniyesi = (gecenDakika * 60) + suAnkiSaniye;
+                break;
+            }
+        }
+
+        if (aktifYayin) {
+            document.getElementById("program-adi").innerText = "ŞU AN YAYINDA: " + aktifYayin.isim;
+            
+            if (!player) {
+                player = new YT.Player('player', {
+                    videoId: aktifYayin.id,
+                    playerVars: {
+                        'autoplay': 1,
+                        'controls': 1,
+                        'start': baslangicSaniyesi,
+                        'modestbranding': 1
+                    }
+                });
+            } else {
+                player.loadVideoById({
+                    videoId: aktifYayin.id,
+                    startSeconds: baslangicSaniyesi
+                });
+            }
+        } else {
+            document.getElementById("program-adi").innerText = "ŞU AN YAYIN YOK (Test Yayını)";
+            // Eğer o saate program yazmadıysan boş kalmasın diye jenerik bir video açar
+            if(!player){
+                player = new YT.Player('player', { videoId: 'dQw4w9WgXcQ', playerVars: {'autoplay': 1} });
+            }
+        }
+    }
+
+    // Her dakika yayını kontrol et (Program değiştiğinde otomatik diğerine geçsin diye)
+    setInterval(yayinYonetmeni, 60000);
+</script>
+
+</body>
+</html>
