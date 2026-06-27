@@ -3,371 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilgitop TV - Canlı Yayın Rejisi</title>
-    
-    <meta name="theme-color" content="#1a1a24">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Bilgitop TV">
-    <meta name="apple-mobile-web-app-title" content="Bilgitop TV">
-    
+    <title>Bilgitop TV</title>
     <style>
-        body {
-            background-color: #0f0f12;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        header {
-            background-color: #1a1a24;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 0;
-            border-bottom: 3px solid #ff4757;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
-        }
+        body { background-color: #0f0f12; color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 800px; padding: 15px; box-sizing: border-box; }
+        .video-container { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; }
+        #tv-frame { width: 100%; height: 100%; border: none; }
         
-        /* 🇦🇿 AZERBAYCAN BAYRAKLI LOGO */
-        .az-logo-badge {
-            display: inline-flex;
-            flex-direction: column;
-            width: 120px;
-            height: 35px;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-        }
-        .stripe-blue { background: #0092bc; width: 100%; height: 33.33%; }
-        .stripe-red { background: #e3001b; width: 100%; height: 33.33%; }
-        .stripe-green { background: #009775; width: 100%; height: 33.33%; }
-        .logo-text-overlay {
-            position: absolute;
-            color: white;
-            font-size: 11px;
-            font-weight: 900;
-            text-shadow: 2px 2px 3px rgba(0,0,0,1);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden; /* Dışarı taşan YouTube logolarını gizler */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            aspect-ratio: 16/9;
-        }
-        
-        /* 🔥 YOUTUBE GİZLEME TAKTİĞİ: ZOOM VE ETKİLEŞİM İPTALİ */
-        #tv-frame {
-            position: absolute;
-            top: -10%; /* Üstteki başlığı çerçevenin dışına iter */
-            left: -5%; /* Sol ve sağ boşlukları dışarı iter */
-            width: 110%; 
-            height: 120%; /* Alttaki logoyu çerçevenin dışına iter */
-            border: none;
-            pointer-events: none; /* KULLANICI VİDEOYA TIKLAYAMAZ VEYA DURDURAMAZ */
-        }
-        
-        /* 📺 VİDEO ÜZERİNDEKİ LOGO */
-        .tv-watermark {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 50px;
-            height: 15px;
-            z-index: 99;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-        .tv-watermark .logo-text-overlay {
-            font-size: 5px;
-        }
-
-        /* 🎬 JENERİK ALT BANDI */
-        #tv-promo-banner {
-            display: none;
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            background: rgba(26, 26, 36, 0.95);
-            border-left: 5px solid #ff4757;
-            border-radius: 4px;
-            padding: 8px 12px;
-            z-index: 100;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        /* 🏷️ PROGRAM İSMİ (SAĞ ALT) */
+        /* 1. Dizi ismi tasarımı (Küçük ve şeffaf) */
         #dizi-tag-box {
-            display: none;
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border-right: 4px solid #ff4757;
-            padding: 6px 12px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-            z-index: 98;
-            text-transform: uppercase;
+            display: none; position: absolute; bottom: 10px; right: 10px;
+            font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.7);
+            text-shadow: 1px 1px 2px #000; z-index: 98;
         }
 
-        /* 🛒 SESSİZ MARKET REKLAMI (SOL ALT) */
+        /* 2. Mini reklam tasarımı */
         #silent-ad-banner {
-            display: none;
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: rgba(15, 15, 20, 0.9);
-            border-top: 2px solid #2ed573;
-            padding: 5px 15px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #2ed573;
-            border-radius: 3px;
-            z-index: 97;
+            display: none; position: absolute; bottom: 10px; left: 10px;
+            background: rgba(46, 213, 115, 0.8); padding: 3px 8px;
+            font-size: 10px; font-weight: bold; color: #fff;
+            border-radius: 3px; z-index: 97;
         }
-
-        /* MOBİL OYNATMA BUTONU */
-        #start-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15,15,18,0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            cursor: pointer;
-        }
-        .start-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(255,71,87,0.4);
-            cursor: pointer;
-        }
-
-        .current-program { background: #1a1a24; padding: 12px; margin-top: 12px; border-radius: 8px; border-left: 5px solid #ff4757; font-size: 15px; font-weight: bold; }
-        .schedule-container { margin-top: 20px; background: #1a1a24; border-radius: 12px; padding: 15px; width: 100%; box-sizing: border-box; }
-        .schedule-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; color: #ff4757; border-bottom: 1px solid #252533; padding-bottom: 8px; }
-        .schedule-list { display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; }
-        .schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #252533; border-radius: 6px; font-size: 13px; }
-        .schedule-item.active { background: #ff4757; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="az-logo-badge">
-            <div class="stripe-blue"></div>
-            <div class="stripe-red"></div>
-            <div class="stripe-green"></div>
-            <div class="logo-text-overlay">Bilgitop TV</div>
-        </div>
-    </header>
-
     <div class="container">
         <div class="video-container">
-            <div id="start-overlay" onclick="yayiniBaslat()">
-                <button class="start-btn">▶ CANLI YAYINI BAŞLAT</button>
-            </div>
-
-            <div class="az-logo-badge tv-watermark">
-                <div class="stripe-blue"></div>
-                <div class="stripe-red"></div>
-                <div class="stripe-green"></div>
-                <div class="logo-text-overlay">Bilgitop TV</div>
-            </div>
-            
-            <div id="tv-promo-banner">
-                <div class="az-logo-badge" style="width: 60px; height: 18px;">
-                    <div class="stripe-blue"></div>
-                    <div class="stripe-red"></div>
-                    <div class="stripe-green"></div>
-                    <div class="logo-text-overlay" style="font-size: 5px;">Bilgitop TV</div>
-                </div>
-                <div id="banner-text-part"></div>
-            </div>
-
             <div id="dizi-tag-box"></div>
             <div id="silent-ad-banner"></div>
-
             <iframe id="tv-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
-        
-        <div class="current-program" id="live-program-title">Şu An Yayında: Bağlanılıyor...</div>
-
-        <div class="schedule-container">
-            <div class="schedule-title">📺 BUGÜN YAYIN AKIŞI</div>
-            <div class="schedule-list" id="schedule-list-ui"></div>
-        </div>
+        <div id="live-program-title" style="margin-top:10px; font-size:14px; font-weight:bold;">Yükleniyor...</div>
     </div>
 
     <script>
-        var currentPlayingUrl = "";
-        var sonAnonsEdilenProg = "";
-        var rejiAktif = false;
-
-        // SESLİ, MODESTBRANDING VE KONTROLSÜZ YENİ LİNKLER
-        const YT_PARAMS = "?autoplay=1&controls=0&modestbranding=1&rel=0&disablekb=1&playsinline=1&showinfo=0";
-        
-        const YAYIN_AKISLARI = {
-            1: [
-                { start: "00:00", end: "07:00", title: "Gece Kesintisiz Sinema Modu", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "film" },
-                { start: "07:00", end: "09:00", title: "Bilgitop ile Sabah Haberleri", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS, type: "haber" },
-                { start: "09:00", end: "09:10", title: "Reklam Kuşağı (BİM, ŞOK, A101)", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
-                { start: "09:10", end: "10:30", title: "TRT EBA İlkokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
-                { start: "10:30", end: "11:30", title: "Bilgitop Kids (Bugs Bunny Özel)", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS, type: "kids" },
-                { start: "11:30", end: "11:40", title: "Sinema Reklamları & Tanıtımlar", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
-                { start: "11:40", end: "13:00", title: "TRT EBA Ortaokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
-                { start: "13:00", end: "15:30", title: "Kemal Sunal Nostalji Kuşağı", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS, type: "dizi" },
-                { start: "15:30", end: "15:40", title: "Büyük Market Reklam Kuşağı", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
-                { start: "15:40", end: "17:00", title: "TRT EBA Lise Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
-                { start: "17:00", end: "19:30", title: "Bilgitop TV Ana Haber Bülteni", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS, type: "haber" },
-                { start: "19:30", end: "23:59", title: "Popüler Dizi & Film Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "dizi" }
-            ]
-        };
-
-        for(let i=0; i<=6; i++) { YAYIN_AKISLARI[i] = YAYIN_AKISLARI[1]; }
-
-        function sesliAnonsYap(metin) {
-            if ('speechSynthesis' in window && rejiAktif) {
-                window.speechSynthesis.cancel();
-                var utterance = new SpeechSynthesisUtterance(metin);
-                utterance.lang = 'tr-TR';
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        const REKLAM_METINLERI = [
-            "SPONSOR: BİM Marketlerindeki Aktüel Fırsatları Kaçırmayın!",
-            "SPONSOR: ŞOK Ucuzluk Çarşısı Her Hafta Sizinle!",
-            "SPONSOR: A101 Harca Harca Bitmez İndirimleri Başladı!",
-            "SPONSOR: Migros Sanal Market Siparişleriniz Anında Kapınızda!",
-            "VİZYONDA: Bilgitop Studios Sunar: Yeni Sinema Filmi Çok Yakında!"
+        const YT_PARAMS = "?autoplay=1&modestbranding=1&rel=0&playsinline=1";
+        const YAYIN_AKISLARI = [
+            { start: 0, end: 420, title: "Gece Sineması", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS },
+            { start: 420, end: 540, title: "Sabah Haberleri", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS },
+            { start: 540, end: 550, title: "Reklamlar", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS },
+            { start: 550, end: 630, title: "EBA Ders", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS },
+            { start: 630, end: 690, title: "Oha Ananın qmı", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS }
         ];
-
-        function yayiniBaslat() {
-            rejiAktif = true;
-            document.getElementById('start-overlay').style.display = 'none';
-            otomasyonuCalistir();
-        }
 
         function otomasyonuCalistir() {
             var simdi = new Date();
-            var bugunKodu = simdi.getDay();
-            var saat = simdi.getHours();
-            var dakika = simdi.getMinutes();
-            var toplamDakika = (saat * 60) + dakika;
-            var bugunkuAkis = YAYIN_AKISLARI[bugunKodu];
-            var aktifProgram = null;
-            var aktifIndex = -1;
+            var dakika = (simdi.getHours() * 60) + simdi.getMinutes();
+            var frame = document.getElementById('tv-frame');
+            var tag = document.getElementById('dizi-tag-box');
+            var ad = document.getElementById('silent-ad-banner');
+            
+            var aktif = YAYIN_AKISLARI.find(p => dakika >= p.start && dakika < p.end);
 
-            for (var i = 0; i < bugunkuAkis.length; i++) {
-                var p = bugunkuAkis[i];
-                var startParts = p.start.split(":");
-                var endParts = p.end.split(":");
-                var startMin = (parseInt(startParts[0]) * 60) + parseInt(startParts[1]);
-                var endMin = (parseInt(endParts[0]) * 60) + parseInt(endParts[1]);
-                
-                if (toplamDakika >= startMin && toplamDakika < endMin) {
-                    aktifProgram = p;
-                    aktifProgram.startMin = startMin;
-                    aktifProgram.endMin = endMin;
-                    aktifIndex = i;
-                    break;
+            if (aktif) {
+                // 4. Yeniden başlamaması için kontrol
+                if (frame.src.split('?')[0] !== aktif.url.split('?')[0]) {
+                    // Senkronize başlangıç için start süresini hesapla
+                    var baslangicZamani = (dakika - aktif.start) * 60;
+                    frame.src = aktif.url + "&start=" + baslangicZamani;
+                    document.getElementById('live-program-title').innerText = "Yayında: " + aktif.title;
                 }
-            }
-
-            var listUi = document.getElementById('schedule-list-ui');
-            listUi.innerHTML = "";
-            bugunkuAkis.forEach(function(prog, idx) {
-                var item = document.createElement('div');
-                item.className = "schedule-item" + (aktifIndex === idx ? " active" : "");
-                item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span style='font-size:12px; font-weight:bold;'>" + (aktifIndex === idx ? "● CANLI" : prog.end) + "</span>";
-                listUi.appendChild(item);
-            });
-
-            if (aktifProgram && rejiAktif) {
-                document.getElementById('live-program-title').innerHTML = "📺 Şu An Yayında: <span style='color:#ff4757;'>" + aktifProgram.title + "</span>";
                 
-                var gecenDakika = toplamDakika - aktifProgram.startMin;
-                var kalanDakika = aktifProgram.endMin - toplamDakika;
-                
-                var promoBanner = document.getElementById('tv-promo-banner');
-                var bannerText = document.getElementById('banner-text-part');
-                var diziTag = document.getElementById('dizi-tag-box');
-                var silentAd = document.getElementById('silent-ad-banner');
+                tag.style.display = 'block';
+                tag.innerText = aktif.title;
 
-                if (gecenDakika < 2) {
-                    promoBanner.style.display = 'flex';
-                    diziTag.style.display = 'none';
-                    silentAd.style.display = 'none';
-
-                    bannerText.innerHTML = "🚀 <span style='color:#ff4757;'> " + aktifProgram.title + "</span> BAŞLIYOR!";
-                    if(sonAnonsEdilenProg !== aktifProgram.title) {
-                        sesliAnonsYap(aktifProgram.title + " başlıyor, iyi seyirler dileriz.");
-                        sonAnonsEdilenProg = aktifProgram.title;
-                    }
-                } else if (kalanDakika <= 2) {
-                    var sonrakiProg = bugunkuAkis[aktifIndex + 1] || bugunkuAkis[0];
-                    promoBanner.style.display = 'flex';
-                    diziTag.style.display = 'none';
-                    silentAd.style.display = 'none';
-                    
-                    bannerText.innerHTML = "<span style='color:#ff4757; font-size:10px;'>AZ SONRA BİLGİTOP TV'DE</span><br>" + sonrakiProg.title;
-
-                    if(sonAnonsEdilenProg !== "az-sonra-" + sonrakiProg.title) {
-                        sesliAnonsYap("Az sonra Bilgitop TV'de " + sonrakiProg.title + " ekranlarınızda olacak.");
-                        sonAnonsEdilenProg = "az-sonra-" + sonrakiProg.title;
-                    }
+                // 2. 5 dakikada bir reklam (dakika 5'in katı ise)
+                if (simdi.getMinutes() % 5 === 0) {
+                    ad.style.display = 'block';
+                    ad.innerText = "SPONSOR: Bilgitop Fırsatları";
                 } else {
-                    // ARTIK PROGRAM TÜRÜ FARK ETMEKSİZİN İSİM VE REKLAM ÇIKIYOR
-                    promoBanner.style.display = 'none';
-                    diziTag.style.display = 'block';
-                    diziTag.innerText = aktifProgram.title;
-                    
-                    silentAd.style.display = 'block';
-                    var reklamIndex = dakika % REKLAM_METINLERI.length;
-                    silentAd.innerText = REKLAM_METINLERI[reklamIndex];
-                }
-
-                if (currentPlayingUrl !== aktifProgram.url) {
-                    currentPlayingUrl = aktifProgram.url;
-                    document.getElementById('tv-frame').src = aktifProgram.url;
+                    ad.style.display = 'none';
                 }
             }
         }
-
-        setInterval(otomasyonuCalistir, 10000);
+        setInterval(otomasyonuCalistir, 1000);
     </script>
 </body>
 </html>
