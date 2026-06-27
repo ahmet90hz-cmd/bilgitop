@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bilgitop TV - Canlı Yayın Rejisi</title>
     
-    <!-- Android PWA / APK Yükleme Ayarları ve SEO -->
     <meta name="theme-color" content="#1a1a24">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Bilgitop TV">
     <meta name="apple-mobile-web-app-title" content="Bilgitop TV">
-    <meta name="description" content="Bilgitop TV kesintisiz canlı yayın platformu.">
     
     <style>
         body {
@@ -72,27 +70,31 @@
             width: 100%;
             background: #000;
             border-radius: 12px;
-            overflow: hidden;
+            overflow: hidden; /* Dışarı taşan YouTube logolarını gizler */
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             aspect-ratio: 16/9;
         }
         
-        /* GÜVENLİ OYNATICI (IFRAME) */
+        /* 🔥 YOUTUBE GİZLEME TAKTİĞİ: ZOOM VE ETKİLEŞİM İPTALİ */
         #tv-frame {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            top: -10%; /* Üstteki başlığı çerçevenin dışına iter */
+            left: -5%; /* Sol ve sağ boşlukları dışarı iter */
+            width: 110%; 
+            height: 120%; /* Alttaki logoyu çerçevenin dışına iter */
             border: none;
+            pointer-events: none; /* KULLANICI VİDEOYA TIKLAYAMAZ VEYA DURDURAMAZ */
         }
         
-        /* 📺 VİDEO ÜZERİNDEKİ LOGO (MİNİCİK) */
+        /* 📺 VİDEO ÜZERİNDEKİ LOGO */
         .tv-watermark {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 45px;
-            height: 14px;
+            top: 15px;
+            left: 15px;
+            width: 50px;
+            height: 15px;
             z-index: 99;
-            opacity: 0.6;
+            opacity: 0.8;
             pointer-events: none;
         }
         .tv-watermark .logo-text-overlay {
@@ -118,13 +120,13 @@
             font-size: 13px;
         }
 
-        /* 🏷️ DİZİ/FİLM SAĞ ALT İSİMLİK */
+        /* 🏷️ PROGRAM İSMİ (SAĞ ALT) */
         #dizi-tag-box {
             display: none;
             position: absolute;
             bottom: 15px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             border-right: 4px solid #ff4757;
             padding: 6px 12px;
             border-radius: 3px;
@@ -134,7 +136,7 @@
             text-transform: uppercase;
         }
 
-        /* 🛒 SESSİZ ALT BANT REKLAMLARI */
+        /* 🛒 SESSİZ MARKET REKLAMI (SOL ALT) */
         #silent-ad-banner {
             display: none;
             position: absolute;
@@ -170,6 +172,7 @@
             font-weight: bold;
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(255,71,87,0.4);
+            cursor: pointer;
         }
 
         .current-program { background: #1a1a24; padding: 12px; margin-top: 12px; border-radius: 8px; border-left: 5px solid #ff4757; font-size: 15px; font-weight: bold; }
@@ -193,12 +196,10 @@
 
     <div class="container">
         <div class="video-container">
-            <!-- MOBİL OTOMATİK OYNATMA KİLİDİNİ AÇAN EKRAN -->
             <div id="start-overlay" onclick="yayiniBaslat()">
                 <button class="start-btn">▶ CANLI YAYINI BAŞLAT</button>
             </div>
 
-            <!-- MİNİK TV LOGOSU -->
             <div class="az-logo-badge tv-watermark">
                 <div class="stripe-blue"></div>
                 <div class="stripe-red"></div>
@@ -206,7 +207,6 @@
                 <div class="logo-text-overlay">Bilgitop TV</div>
             </div>
             
-            <!-- REJİ JENERİK BANDI -->
             <div id="tv-promo-banner">
                 <div class="az-logo-badge" style="width: 60px; height: 18px;">
                     <div class="stripe-blue"></div>
@@ -217,13 +217,9 @@
                 <div id="banner-text-part"></div>
             </div>
 
-            <!-- DİZİ İSMİ (SAĞ ALT) -->
             <div id="dizi-tag-box"></div>
-
-            <!-- SESSİZ MARKET REKLAMI (SOL ALT) -->
             <div id="silent-ad-banner"></div>
 
-            <!-- KESİNTİSİZ AKILLI MEDYA OYNATICI -->
             <iframe id="tv-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
         
@@ -240,25 +236,26 @@
         var sonAnonsEdilenProg = "";
         var rejiAktif = false;
 
-        // %100 YERLEŞTİRMEYE AÇIK VE ÇALIŞAN TEST VİDEOLARI (Embed İzinli)
+        // SESLİ, MODESTBRANDING VE KONTROLSÜZ YENİ LİNKLER
+        const YT_PARAMS = "?autoplay=1&controls=0&modestbranding=1&rel=0&disablekb=1&playsinline=1&showinfo=0";
+        
         const YAYIN_AKISLARI = {
             1: [
-                { start: "00:00", end: "07:00", title: "Gece Kesintisiz Sinema Modu", url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1&controls=0", type: "film" },
-                { start: "07:00", end: "09:00", title: "Bilgitop ile Sabah Haberleri", url: "https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&mute=1&controls=0", type: "haber" },
-                { start: "09:00", end: "09:10", title: "Reklam Kuşağı (BİM, ŞOK, A101)", url: "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1&mute=1&controls=0", type: "reklam" },
-                { start: "09:10", end: "10:30", title: "TRT EBA İlkokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1&controls=0", type: "eba" },
-                { start: "10:30", end: "11:30", title: "Bilgitop Kids (Bugs Bunny Özel)", url: "https://www.youtube.com/embed/YE7VzlLtp-4?autoplay=1&mute=1&controls=0", type: "kids" },
-                { start: "11:30", end: "11:40", title: "Sinema Reklamları & Tanıtımlar", url: "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1&mute=1&controls=0", type: "reklam" },
-                { start: "11:40", end: "13:00", title: "TRT EBA Ortaokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1&controls=0", type: "eba" },
-                { start: "13:00", end: "15:30", title: "Kemal Sunal Nostalji Kuşağı", url: "https://www.youtube.com/embed/YE7VzlLtp-4?autoplay=1&mute=1&controls=0", type: "dizi" },
-                { start: "15:30", end: "15:40", title: "Büyük Market Reklam Kuşağı", url: "https://www.youtube.com/embed/LXb3EKWsInQ?autoplay=1&mute=1&controls=0", type: "reklam" },
-                { start: "15:40", end: "17:00", title: "TRT EBA Lise Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1&controls=0", type: "eba" },
-                { start: "17:00", end: "19:30", title: "Bilgitop TV Ana Haber Bülteni", url: "https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&mute=1&controls=0", type: "haber" },
-                { start: "19:30", end: "23:59", title: "Popüler Dizi & Film Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&mute=1&controls=0", type: "dizi" }
+                { start: "00:00", end: "07:00", title: "Gece Kesintisiz Sinema Modu", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "film" },
+                { start: "07:00", end: "09:00", title: "Bilgitop ile Sabah Haberleri", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS, type: "haber" },
+                { start: "09:00", end: "09:10", title: "Reklam Kuşağı (BİM, ŞOK, A101)", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
+                { start: "09:10", end: "10:30", title: "TRT EBA İlkokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
+                { start: "10:30", end: "11:30", title: "Bilgitop Kids (Bugs Bunny Özel)", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS, type: "kids" },
+                { start: "11:30", end: "11:40", title: "Sinema Reklamları & Tanıtımlar", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
+                { start: "11:40", end: "13:00", title: "TRT EBA Ortaokul Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
+                { start: "13:00", end: "15:30", title: "Kemal Sunal Nostalji Kuşağı", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS, type: "dizi" },
+                { start: "15:30", end: "15:40", title: "Büyük Market Reklam Kuşağı", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS, type: "reklam" },
+                { start: "15:40", end: "17:00", title: "TRT EBA Lise Ders Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "eba" },
+                { start: "17:00", end: "19:30", title: "Bilgitop TV Ana Haber Bülteni", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS, type: "haber" },
+                { start: "19:30", end: "23:59", title: "Popüler Dizi & Film Kuşağı", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS, type: "dizi" }
             ]
         };
 
-        // Haftanın 7 günü için aynı yayın akışını kopyala
         for(let i=0; i<=6; i++) { YAYIN_AKISLARI[i] = YAYIN_AKISLARI[1]; }
 
         function sesliAnonsYap(metin) {
@@ -310,7 +307,6 @@
                 }
             }
 
-            // YAYIN AKIŞI UI GÜNCELLEME
             var listUi = document.getElementById('schedule-list-ui');
             listUi.innerHTML = "";
             bugunkuAkis.forEach(function(prog, idx) {
@@ -331,30 +327,22 @@
                 var diziTag = document.getElementById('dizi-tag-box');
                 var silentAd = document.getElementById('silent-ad-banner');
 
-                // OTOMATİK REJİ KONTROLLERİ
                 if (gecenDakika < 2) {
                     promoBanner.style.display = 'flex';
                     diziTag.style.display = 'none';
                     silentAd.style.display = 'none';
 
-                    if (aktifProgram.type === "kids") {
-                        bannerText.innerHTML = "🌟 <span style='color:#ff4757;'>BİLGİTOP KIDS</span> BAŞLIYOR!";
-                        if(sonAnonsEdilenProg !== aktifProgram.title) {
-                            sesliAnonsYap("Bilgitop Kids başlıyor, iyi seyirler çocuklar!");
-                            sonAnonsEdilenProg = aktifProgram.title;
-                        }
-                    } else {
-                        bannerText.innerHTML = "🚀 <span style='color:#ff4757;'> " + aktifProgram.title + "</span> BAŞLIYOR!";
-                        if(sonAnonsEdilenProg !== aktifProgram.title) {
-                            sesliAnonsYap(aktifProgram.title + " başlıyor, iyi seyirler dileriz.");
-                            sonAnonsEdilenProg = aktifProgram.title;
-                        }
+                    bannerText.innerHTML = "🚀 <span style='color:#ff4757;'> " + aktifProgram.title + "</span> BAŞLIYOR!";
+                    if(sonAnonsEdilenProg !== aktifProgram.title) {
+                        sesliAnonsYap(aktifProgram.title + " başlıyor, iyi seyirler dileriz.");
+                        sonAnonsEdilenProg = aktifProgram.title;
                     }
                 } else if (kalanDakika <= 2) {
                     var sonrakiProg = bugunkuAkis[aktifIndex + 1] || bugunkuAkis[0];
                     promoBanner.style.display = 'flex';
                     diziTag.style.display = 'none';
                     silentAd.style.display = 'none';
+                    
                     bannerText.innerHTML = "<span style='color:#ff4757; font-size:10px;'>AZ SONRA BİLGİTOP TV'DE</span><br>" + sonrakiProg.title;
 
                     if(sonAnonsEdilenProg !== "az-sonra-" + sonrakiProg.title) {
@@ -362,19 +350,14 @@
                         sonAnonsEdilenProg = "az-sonra-" + sonrakiProg.title;
                     }
                 } else {
+                    // ARTIK PROGRAM TÜRÜ FARK ETMEKSİZİN İSİM VE REKLAM ÇIKIYOR
                     promoBanner.style.display = 'none';
+                    diziTag.style.display = 'block';
+                    diziTag.innerText = aktifProgram.title;
                     
-                    if (aktifProgram.type === "dizi" || aktifProgram.type === "film") {
-                        diziTag.style.display = 'block';
-                        diziTag.innerText = aktifProgram.title;
-                        
-                        silentAd.style.display = 'block';
-                        var reklamIndex = dakika % REKLAM_METINLERI.length;
-                        silentAd.innerText = REKLAM_METINLERI[reklamIndex];
-                    } else {
-                        diziTag.style.display = 'none';
-                        silentAd.style.display = 'none';
-                    }
+                    silentAd.style.display = 'block';
+                    var reklamIndex = dakika % REKLAM_METINLERI.length;
+                    silentAd.innerText = REKLAM_METINLERI[reklamIndex];
                 }
 
                 if (currentPlayingUrl !== aktifProgram.url) {
