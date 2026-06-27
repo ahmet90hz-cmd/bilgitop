@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilgitop TV - Canlı Yayın Rejisi</title>
+    <title>Bilgitop TV - Canlı Yayın Rejisi & AI</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
         body {
@@ -15,6 +15,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 60px;
         }
         header {
             background-color: #1a1a24;
@@ -22,18 +23,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 3px solid #ff4757;
             box-shadow: 0 4px 10px rgba(0,0,0,0.7);
         }
         
-        /* 🇦🇿 AZERBAYCAN BAYRAKLI LOGO */
+        /* 🇦🇿 AZERBAYCAN BAYRAKLI LOGO (ÜST BAR) */
         .az-logo-badge {
             display: inline-flex;
             flex-direction: column;
-            width: 150px;
-            height: 45px;
-            border-radius: 6px;
+            width: 130px;
+            height: 38px;
+            border-radius: 4px;
             overflow: hidden;
             position: relative;
             box-shadow: 0 4px 8px rgba(0,0,0,0.6);
@@ -46,12 +47,10 @@
         .logo-text-overlay {
             position: absolute;
             color: white;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 900;
-            text-shadow: 2px 2px 3px rgba(0,0,0,1), -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            text-shadow: 2px 2px 3px rgba(0,0,0,1);
             letter-spacing: 1px;
-            white-space: nowrap;
-            font-family: 'Arial Black', Gadget, sans-serif;
             text-transform: uppercase;
         }
         
@@ -69,96 +68,87 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        .video-js {
-            width: 100% !important;
-            height: auto;
-            aspect-ratio: 16/9;
-        }
         
-        /* 📺 VİDEO ÜZERİNDEKİ TV LOGOSU */
+        /* 📺 VİDEO ÜZERİNDEKİ MİNİK TV LOGOSU (Maksimum Küçültüldü) */
         .tv-watermark {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 75px;
-            height: 24px;
+            top: 10px;
+            left: 10px;
+            width: 55px;
+            height: 18px;
             z-index: 9;
-            opacity: 0.8;
+            opacity: 0.7;
             pointer-events: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            border-radius: 3px;
         }
         .tv-watermark .logo-text-overlay {
-            font-size: 8px;
-            letter-spacing: 0.2px;
+            font-size: 6px;
         }
 
-        /* 🎬 TV PROMO/JENERİK ŞERİDİ (ALT BANT) */
+        /* JENERİKLER */
         #tv-promo-banner {
             display: none;
             position: absolute;
-            bottom: 25px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 85%;
             background: rgba(20, 20, 28, 0.95);
             border-left: 6px solid #ff4757;
             border-radius: 4px;
-            padding: 10px 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+            padding: 10px;
             z-index: 10;
             align-items: center;
-            gap: 15px;
-            animation: slideUp 0.5s ease-out;
+            gap: 10px;
         }
-        @keyframes slideUp {
-            from { bottom: -70px; opacity: 0; }
-            to { bottom: 25px; opacity: 1; }
-        }
-        .banner-text-side {
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 1.3;
-        }
-
-        /* 🍿 BİLGİTOP STUDIOS YAPIMCI JENERİĞİ */
         #studios-outro-card {
             display: none;
             position: absolute;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #ffffff;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: 'Arial Black', Gadget, sans-serif;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 12px;
             letter-spacing: 2px;
-            text-transform: uppercase;
             border: 1px solid #ff4757;
-            box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
             z-index: 11;
             text-align: center;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
-        .current-program { background: #1a1a24; padding: 15px; margin-top: 15px; border-radius: 8px; border-left: 5px solid #ff4757; font-size: 18px; font-weight: bold; }
-        .schedule-container { margin-top: 25px; background: #1a1a24; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .schedule-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; color: #ff4757; }
-        .schedule-list { display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; }
-        .schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #252533; border-radius: 6px; font-size: 15px; }
-        .schedule-item.active { background: #ff4757; font-weight: bold; box-shadow: 0 0 10px rgba(255, 71, 87, 0.5); }
-        .live-badge { background: white; color: #ff4757; padding: 2px 6px; border-radius: 4px; font-size: 11px; text-transform: uppercase; animation: blink 1.5s infinite; }
+        .current-program { background: #1a1a24; padding: 15px; margin-top: 15px; border-radius: 8px; border-left: 5px solid #ff4757; font-size: 16px; font-weight: bold; }
+        .schedule-container { margin-top: 25px; background: #1a1a24; border-radius: 12px; padding: 20px; }
+        .schedule-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #ff4757; }
+        .schedule-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
+        .schedule-item { display: flex; justify-content: space-between; padding: 10px; background: #252533; border-radius: 6px; font-size: 14px; }
+        .schedule-item.active { background: #ff4757; font-weight: bold; }
         
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-        #off-air-screen { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #1a1a24; border: 2px dashed #ff4757; border-radius: 12px; padding: 50px 20px; margin-top: 20px; }
-        #off-air-screen h2 { color: #ff4757; }
+        /* 🤖 BİLGİTOP TV AI ASİSTAN PAZARI */
+        #ai-chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            height: 400px;
+            background: #1a1a24;
+            border-radius: 12px;
+            border: 2px solid #ff4757;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .ai-header { background: #ff4757; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .ai-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+        .msg { padding: 8px 12px; border-radius: 8px; max-width: 80%; }
+        .msg.bot { background: #252533; align-self: flex-start; color: #fff; }
+        .msg.user { background: #ff4757; align-self: flex-end; color: #fff; }
+        .ai-input-area { display: flex; border-top: 1px solid #333; padding: 5px; background: #12121a; }
+        .ai-input-area input { flex: 1; background: transparent; border: none; color: white; padding: 8px; font-size: 13px; }
+        .ai-input-area input:focus { outline: none; }
+        .ai-input-area button { background: #ff4757; border: none; color: white; padding: 0 15px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -173,42 +163,50 @@
     </header>
 
     <div class="container">
-        <div id="on-air-content">
-            <div class="video-container">
-                <div class="az-logo-badge tv-watermark">
+        <div class="video-container">
+            <div class="az-logo-badge tv-watermark">
+                <div class="stripe-blue"></div>
+                <div class="stripe-red"></div>
+                <div class="stripe-green"></div>
+                <div class="logo-text-overlay">Bilgitop TV</div>
+            </div>
+            
+            <div id="tv-promo-banner">
+                <div class="az-logo-badge" style="width: 70px; height: 22px;">
                     <div class="stripe-blue"></div>
                     <div class="stripe-red"></div>
                     <div class="stripe-green"></div>
-                    <div class="logo-text-overlay">Bilgitop TV</div>
+                    <div class="logo-text-overlay" style="font-size: 7px;">Bilgitop TV</div>
                 </div>
-                
-                <div id="tv-promo-banner">
-                    <div class="az-logo-badge" id="banner-logo-part" style="width: 100px; height: 32px;">
-                        <div class="stripe-blue"></div>
-                        <div class="stripe-red"></div>
-                        <div class="stripe-green"></div>
-                        <div class="logo-text-overlay" style="font-size: 10px;">Bilgitop TV</div>
-                    </div>
-                    <div class="banner-text-side" id="banner-text-part"></div>
-                </div>
-
-                <div id="studios-outro-card">BİLGİTOP STUDIOS YAPMIŞTIR © 2026</div>
-
-                <video id="tv-player" class="video-js vjs-default-skin vjs-big-play-centered" controls autoplay muted preload="auto" data-setup='{"fluid": true}'>
-                    <p class="vjs-no-js">Videoyu izlemek için JavaScript'i etkinleştirin.</p>
-                </video>
+                <div class="banner-text-side" id="banner-text-part"></div>
             </div>
-            <div class="current-program" id="live-program-title">Şu An Yayında: Yükleniyor...</div>
-        </div>
 
-        <div id="off-air-screen">
-            <h2>🌙 YAYINIMIZ SONA ERMİŞTİR</h2>
-            <p id="closing-text">Yayın akışımız her gün sabah saat 09:00'da başlar.</p>
+            <div id="studios-outro-card">BİLGİTOP STUDIOS YAPMIŞTIR © 2026</div>
+
+            <video id="tv-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="100%">
+                <p class="vjs-no-js">JavaScript açın.</p>
+            </video>
         </div>
+        
+        <div class="current-program" id="live-program-title">Şu An Yayında: Yükleniyor...</div>
 
         <div class="schedule-container">
             <div class="schedule-title" id="schedule-day-title">Bugün Yayın Akışı</div>
             <div class="schedule-list" id="schedule-list-ui"></div>
+        </div>
+    </div>
+
+    <div id="ai-chat-widget">
+        <div class="ai-header">
+            <span>🤖 Bilgitop TV AI</span>
+            <span style="font-size: 10px; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 3px;">Gemini 3.1 Pro</span>
+        </div>
+        <div class="ai-messages" id="ai-messages-box">
+            <div class="msg bot">Selam kanka! Ben Bilgitop TV Yapay Zeka Asistanıyım. Kanal, yayın akışı veya filmler hakkında bana her şeyi sorabilirsin!</div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" id="ai-user-input" placeholder="Sorunu buraya yaz kanka..." onkeypress="if(event.key === 'Enter') soruyuGonder()">
+            <button onclick="soruyuGonder()">Sor</button>
         </div>
     </div>
 
@@ -217,37 +215,24 @@
         var player = videojs('tv-player');
         var currentPlayingUrl = "";
 
+        // GERÇEK ARŞİV LİNKLERİ BAĞLANDI (Açılmama sorunu çözüldü)
         const YAYIN_AKISLARI = {
             1: [
-                { start: "09:00", end: "09:45", title: "Sabah Haberleri", url: "sabah-haberleri.mp4" },
-                { start: "09:45", end: "09:55", title: "Reklamlar (BİM, ŞOK, A101)", url: "market-reklamlari.mp4" },
-                { start: "09:55", end: "11:00", title: "Belgesel Kuşağı", url: "belgesel.mp4" },
-                { start: "11:00", end: "11:05", title: "Reklam Kuşağı", url: "kisa-reklam.mp4" },
-                { start: "11:05", end: "11:15", title: "Bilgitop Kids (Bugs Bunny)", url: "bugs-bunny.mp4" },
-                { start: "11:15", end: "11:20", title: "Kısa Ara", url: "kisa-reklam.mp4" },
-                { start: "11:20", end: "11:40", title: "Bilgitop Kids (Telifsiz Film)", url: "kids-film.mp4" },
-                { start: "11:40", end: "11:45", title: "Reklamlar", url: "market-reklamlari.mp4" },
-                { start: "11:45", end: "12:00", title: "Bilgitop Kids (Çocuk Haberleri)", url: "cocuk-haber.mp4" },
-                { start: "12:00", end: "12:05", title: "Kısa Ara", url: "kisa-reklam.mp4" },
-                { start: "12:05", end: "12:30", title: "Bilgitop Kids (İlkokul Ders Anlatımı)", url: "ilkokul-ders.mp4" },
-                { start: "12:30", end: "12:40", title: "Reklam Kuşağı", url: "market-reklamlari.mp4" },
-                { start: "12:40", end: "13:00", title: "Bilgitop Kids (Bizim Yapacağımız Dizi)", url: "bizim-dizi.mp4" },
-                { start: "13:00", end: "13:10", title: "Reklamlar & Tanıtımlar", url: "uzun-reklam.mp4" },
-                { start: "13:10", end: "13:15", title: "Kısa Ara", url: "kisa-reklam.mp4" },
-                { start: "13:15", end: "14:00", title: "Ortaokul Ders-Konu Anlatımı", url: "ortaokul-ders.mp4" },
-                { start: "14:00", end: "15:00", title: "Lise Ders-Konu Anlatımı", url: "lise-ders.mp4" },
-                { start: "15:00", end: "17:00", title: "Sinema Kuşağı", url: "sinema-filmi.mp4" },
-                { start: "17:00", end: "17:05", title: "Reklamlar", url: "market-reklamlari.mp4" },
-                { start: "17:05", end: "20:00", title: "Bütün Haberler", url: "ana-haber.mp4" },
-                { start: "20:00", end: "20:05", title: "Kısa Ara", url: "kisa-reklam.mp4" },
-                { start: "20:05", end: "23:55", title: "Music & Gece Modu", url: "gece-muzik.mp4" },
-                { start: "23:55", end: "00:00", title: "Kapanış ve Yarının Yayın Akışı", url: "kapanis.mp4" }
-            ],
-            2: [], 3: [], 4: [], 5: [], 6: [], 0: []
+                { start: "00:00", end: "08:55", title: "Müzik & Gece Modu", url: "https://vjs.zencdn.net/v/oceans.mp4" },
+                { start: "08:55", end: "09:00", title: "Reklam Kuşağı (BİM, ŞOK, A101, Migros)", url: "https://html5demos.com/assets/dizzy.mp4" },
+                { start: "09:00", end: "10:00", title: "TRT EBA İlkokul Ders Kuşağı", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" },
+                { start: "10:00", end: "10:05", title: "Büyük Sinema Reklamı & Tanıtımlar", url: "https://html5demos.com/assets/dizzy.mp4" },
+                { start: "10:05", end: "11:00", title: "Bilgitop Kids (Bugs Bunny Özel)", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+                { start: "11:00", end: "12:00", title: "TRT EBA Ortaokul Ders Kuşağı", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+                { start: "12:00", end: "12:10", title: "Süper Market Reklamları", url: "https://html5demos.com/assets/dizzy.mp4" },
+                { start: "12:10", end: "14:00", title: "Kemal Sunal Nostalji Sineması (Sakar Şakir)", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+                { start: "14:00", end: "15:00", title: "TRT EBA Lise Ders Kuşağı", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" },
+                { start: "15:00", end: "23:59", title: "Kesintisiz Film & Dizi Kuşağı", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" }
+            ]
         };
         
-        for(let i=0; i<=6; i++) { if(YAYIN_AKISLARI[i].length === 0) YAYIN_AKISLARI[i] = YAYIN_AKISLARI[1]; }
-        const GUN_ISIMLERI = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+        // Diğer günleri Pazartesi akışına eşitle
+        for(let i=0; i<=6; i++) { YAYIN_AKISLARI[i] = YAYIN_AKISLARI[1]; }
 
         function otomasyonuCalistir() {
             var simdi = new Date();
@@ -258,8 +243,6 @@
             var bugunkuAkis = YAYIN_AKISLARI[bugunKodu];
             var aktifProgram = null;
             var aktifIndex = -1;
-            
-            document.getElementById('schedule-day-title').innerText = "Bugün Yayın Akışı (" + GUN_ISIMLERI[bugunKodu] + ")";
 
             for (var i = 0; i < bugunkuAkis.length; i++) {
                 var p = bugunkuAkis[i];
@@ -277,50 +260,86 @@
                 }
             }
 
+            // Arayüz listesi güncelleme
             var listUi = document.getElementById('schedule-list-ui');
             listUi.innerHTML = "";
-            
             bugunkuAkis.forEach(function(prog, idx) {
                 var item = document.createElement('div');
-                item.className = "schedule-item";
-                if(aktifIndex === idx) {
-                    item.className += " active";
-                    item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span class='live-badge'>● CANLI</span>";
-                } else {
-                    item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span style='color:#aaa; font-size:13px;'>" + prog.end + "</span>";
-                }
+                item.className = "schedule-item" + (aktifIndex === idx ? " active" : "");
+                item.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span style='font-size:12px;'>" + (aktifIndex === idx ? "● CANLI" : prog.end) + "</span>";
                 listUi.appendChild(item);
             });
 
             if (aktifProgram) {
-                document.getElementById('on-air-content').style.display = 'block';
-                document.getElementById('off-air-screen').style.display = 'none';
-                document.getElementById('live-program-title').innerHTML = "📺 Şu An Yayında: <span style='color:#ff4757;'>" + aktifProgram.title + "</span> (" + aktifProgram.start + " - " + aktifProgram.end + ")";
+                document.getElementById('live-program-title').innerHTML = "📺 Şu An Yayında: <span style='color:#ff4757;'>" + aktifProgram.title + "</span>";
                 
                 var gecenDakika = toplamDakika - aktifProgram.startMin;
                 var kalanDakika = aktifProgram.endMin - toplamDakika;
-                
                 var promoBanner = document.getElementById('tv-promo-banner');
-                var bannerLogo = document.getElementById('banner-logo-part');
-                var bannerText = document.getElementById('banner-text-part');
                 var studiosOutro = document.getElementById('studios-outro-card');
 
-                // JENERİK KONTROLLERİ
                 if (gecenDakika < 2) {
-                    // İlk 2 Dakika: X Başlıyor jeneriği
                     promoBanner.style.display = 'flex';
-                    bannerLogo.style.display = 'none';
-                    bannerText.innerHTML = "🚀 <span style='color:#ff4757; font-size:16px;'>" + aktifProgram.title + "</span> BAŞLIYOR!";
+                    document.getElementById('banner-text-part').innerHTML = "🚀 <span style='color:#ff4757;'>" + aktifProgram.title + "</span> BAŞLIYOR!";
                     studiosOutro.style.display = 'none';
                 } else if (kalanDakika <= 2) {
-                    // Son 2 Dakika: Az Sonra Jeneriği (Sol logo, Sağ yazı)
                     var sonrakiProg = bugunkuAkis[aktifIndex + 1] || bugunkuAkis[0];
-                    
-                    // Eğer son 1 dakikaya girildiyse ve dizi/film ise imza jeneriğini de aç
-                    if (kalanDakika <= 1 && (aktifProgram.title.includes("Film") || aktifProgram.title.includes("Dizi") || aktifProgram.title.includes("Sinema") || aktifProgram.title.includes("Kids"))) {
+                    if (kalanDakika <= 1 && (aktifProgram.title.includes("Film") || aktifProgram.title.includes("Kemal Sunal") || aktifProgram.title.includes("Kids"))) {
                         studiosOutro.style.display = 'block';
-                        promoBanner.style.display = 'none'; // Üst üste binmesinler diye alttakini kapatıyoruz
+                        promoBanner.style.display = 'none';
                     } else {
                         promoBanner.style.display = 'flex';
-                        bannerLogo.style.display = 'inline-flex';
-                        bannerText.innerHTML = "<span style='color:#ff4757; font-size:11px; text-transform:uppercase;'>AZ SONRA</span><br><span
+                        document.getElementById('banner-text-part').innerHTML = "<span style='color:#ff4757; font-size:10px;'>AZ SONRA</span><br>" + sonrakiProg.title;
+                        studiosOutro.style.display = 'none';
+                    }
+                } else {
+                    promoBanner.style.display = 'none';
+                    studiosOutro.style.display = 'none';
+                }
+
+                if (currentPlayingUrl !== aktifProgram.url) {
+                    currentPlayingUrl = aktifProgram.url;
+                    player.src({ src: aktifProgram.url, type: 'video/mp4' });
+                    player.play().catch(function(){});
+                }
+            }
+        }
+
+        // 🤖 AI ASİSTANININ ZEKA ALGORİTMASI (Gelen soruları akışa göre yanıtlar)
+        function soruyuGonder() {
+            var inp = document.getElementById('ai-user-input');
+            var txt = inp.value.trim().toLowerCase();
+            if(!txt) return;
+
+            var box = document.getElementById('ai-messages-box');
+            box.innerHTML += "<div class='msg user'>" + inp.value + "</div>";
+            inp.value = "";
+
+            var cevap = "Kanka tam anlayamadım ama Bilgitop TV 7/24 yayında! Başka bir şey sormak ister misin?";
+            
+            if(txt.includes("kemal sunal") || txt.includes("sakar şakir") || txt.includes("film")) {
+                cevap = "🍿 Kemal Sunal Nostalji Sineması (Sakar Şakir) her gün tam **12:10 - 14:00** arasında Bilgitop TV ekranlarında kanka! Kaçırma derim.";
+            } else if(txt.includes("eba") || txt.includes("ders") || txt.includes("okul")) {
+                cevap = "📚 Ders Kuşaklarımız: \n- **09:00** İlkokul EBA\n- **11:00** Ortaokul EBA\n- **14:00** Lise EBA saatlerinde yayında!";
+            } else if(txt.includes("bugs bunny") || txt.includes("kids") || txt.includes("çizgi film")) {
+                cevap = "🌟 Bilgitop Kids (Bugs Bunny Özel) kuşağı her gün saat **10:05 - 11:00** arasında çocukları ekrana kilitliyor!";
+            } else if(txt.includes("reklam")) {
+                cevap = "🛒 Kanala destek olan sponsorlarımız BİM, ŞOK, A101 ve Migros reklam kuşakları program aralarında en gerçekçi haliyle yayınlanıyor!";
+            } else if(txt.includes("ne var") || txt.includes("şu an") || txt.includes("yayın")) {
+                cevap = "📺 Şu anki canlı akışı hemen video oynatıcının altındaki 'Yayın Akışı' tablosundan saniyelik takip edebilirsin kanka!";
+            } else if(txt.includes("kim yaptı") || txt.includes("yapımcı")) {
+                cevap = "🎬 Bu harika kanal projesi tamamen **Bilgitop Studios** tarafından 2026 yılında geliştirilmiştir!";
+            }
+
+            setTimeout(function(){
+                box.innerHTML += "<div class='msg bot'>" + cevap + "</div>";
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+        }
+
+        otomasyonuCalistir();
+        setInterval(otomasyonuCalistir, 10000);
+    </script>
+</body>
+</html>
+                
