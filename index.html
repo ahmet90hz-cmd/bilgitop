@@ -3,81 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilgitop TV</title>
+    <title>Bilgitop TV - Canlı Reji Sistemi</title>
+    
     <style>
-        body { background-color: #0f0f12; color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 800px; padding: 15px; box-sizing: border-box; }
-        .video-container { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; }
-        #tv-frame { width: 100%; height: 100%; border: none; }
+        body {
+            background-color: #0c0c10;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         
-        /* 1. Dizi ismi tasarımı (Küçük ve şeffaf) */
-        #dizi-tag-box {
-            display: none; position: absolute; bottom: 10px; right: 10px;
-            font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.7);
-            text-shadow: 1px 1px 2px #000; z-index: 98;
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 12px 0;
+            background-color: #14141c;
+            border-bottom: 3px solid #ff4757;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: filter 0.4s ease;
         }
 
-        /* 2. Mini reklam tasarımı */
-        #silent-ad-banner {
-            display: none; position: absolute; bottom: 10px; left: 10px;
-            background: rgba(46, 213, 115, 0.8); padding: 3px 8px;
-            font-size: 10px; font-weight: bold; color: #fff;
-            border-radius: 3px; z-index: 97;
+        /* 🇦🇿 Azerbaycan Bayraklı Logo (Griye dönebilen filtre eklendi) */
+        .bilgitop-logo {
+            display: inline-flex;
+            flex-direction: column;
+            width: 150px;
+            height: 40px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: filter 0.5s ease;
+        }
+        /* Mini reklam çıkınca logoyu gri yapan sınıf */
+        .logo-gri {
+            filter: grayscale(100%) opacity(0.6);
+        }
+        .stripe-b { background: #0092bc; width: 100%; height: 33.3%; }
+        .stripe-r { background: #e3001b; width: 100%; height: 33.3%; }
+        .stripe-g { background: #009775; width: 100%; height: 33.3%; }
+        .logo-text {
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .player-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        #tv-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* TV Kapanış Ekranı */
+        .offline-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #111 25%, #222 25%, #222 50%, #111 50%, #111 75%, #222 75%, #222 100%);
+            background-size: 40px 40px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 999;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .offline-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff4757;
+            text-shadow: 0 0 10px rgba(255,71,87,0.5);
+            margin-bottom: 10px;
+        }
+
+        /* Giriş Buton Ekranı */
+        .start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(12, 12, 16, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .start-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255,71,87,0.4);
+            transition: transform 0.2s;
+        }
+        .start-btn:hover { transform: scale(1.05); }
+
+        /* 🎬 TV JENERİK VE BANT SİSTEMİ */
+        #jenerik-overlay {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 71, 87, 0.9);
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            z-index: 99;
+            text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 🏷️ İnsanın Rahatça Görebileceği Boyutta Program İsmi */
+        #program-tag {
+            display: none;
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 14px; /* Tam ideal görünür boyutta */
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 2px 2px 4px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            z-index: 98;
+            pointer-events: none;
+        }
+
+        /* 🛒 Animasyonlu ve Sessiz Yeni Nesil Alt Reklam Bant Alanı */
+        #mini-ad-box {
+            display: none;
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            width: 60%;
+            background: rgba(20, 20, 28, 0.9);
+            border-left: 4px solid #2ed573;
+            color: #2ed573;
+            padding: 6px 10px;
+            border-radius: 4px;
+            z-index: 97;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .ad-ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 12s linear infinite;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Şu An Yayında Kartı */
+        .live-now-card {
+            background-color: #14141c;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff4757;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Yayın Akışı Listesi */
+        .schedule-box {
+            margin-top: 20px;
+            background-color: #14141c;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .schedule-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff4757;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background-color: #1c1c28;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #a5a5b5;
+        }
+        .schedule-row.active {
+            background-color: #ff4757;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Animasyon Tanımlamaları */
+        @keyframes marquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.9; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.9; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="video-container">
-            <div id="dizi-tag-box"></div>
-            <div id="silent-ad-banner"></div>
-            <iframe id="tv-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <header id="main-header">
+        <div class="bilgitop-logo" id="logo-element">
+            <div class="stripe-b"></div>
+            <div class="stripe-r"></div>
+            <div class="stripe-g"></div>
+            <div class="logo-text">BİLGİTOP TV</div>
         </div>
-        <div id="live-program-title" style="margin-top:10px; font-size:14px; font-weight:bold;">Yükleniyor...</div>
+    </header>
+
+    <div class="container">
+        <div class="player-wrapper">
+            <div id="play-overlay" class="start-overlay" onclick="yayiniBaslat()">
+                <button class="start-btn">▶ YAYINI BAŞLAT</button>
+            </div>
+
+            <div id="offline-layer" class="offline-screen">
+                <div class="offline-title">🔴 KANAL KAPALIDIR</div>
+                <div style="font-size:13px; color:#aaa;">Yarın saat 09:00'da kanalımız açılacaktır.</div>
+            </div>
+
+            <div id="jenerik-overlay">Yayın Başlıyor</div>
+            <div id="program-tag"></div>
+            <div id="mini-ad-box"><span class="ad-ticker" id="ad-text"></span></div>
+
+            <iframe id="tv-player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+
+        <div class="live-now-card">
+            📺 Şu An Yayında: <span id="current-title" style="color: #ff4757;">Yükleniyor...</span>
+        </div>
+
+        <div class="schedule-box">
+            <div class="schedule-header">📺 BUGÜN YAYIN AKIŞI</div>
+            <div id="ui-list" class="schedule-list"></div>
+        </div>
     </div>
 
     <script>
-        const YT_PARAMS = "?autoplay=1&modestbranding=1&rel=0&playsinline=1";
-        const YAYIN_AKISLARI = [
-            { start: 0, end: 420, title: "Gece Sineması", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS },
-            { start: 420, end: 540, title: "Sabah Haberleri", url: "https://www.youtube.com/embed/M7lc1UVf-VE" + YT_PARAMS },
-            { start: 540, end: 550, title: "Reklamlar", url: "https://www.youtube.com/embed/LXb3EKWsInQ" + YT_PARAMS },
-            { start: 550, end: 630, title: "EBA Ders", url: "https://www.youtube.com/embed/aqz-KE-bpKQ" + YT_PARAMS },
-            { start: 630, end: 690, title: "Oha Ananın qmı", url: "https://www.youtube.com/embed/YE7VzlLtp-4" + YT_PARAMS }
+        var oynaticiAktif = false;
+        var sonOynatilanId = "";
+
+        // Türk firmalarının kaliteli yeni reklam listesi
+        const TÜRK_REKLAMLARI = [
+            "TÜRK HAVA YOLLARI: Dünyanın En Çok Ülkesine Uçan Havayolu Keyfi!",
+            "TRENDYOL: Süper İndirim Günleri Başladı, Sepeti Doldur Fırsatı Kaçırma!",
+            "BİM AKTÜEL: Bu Cuma Kaliteli Ürünler İnanılmaz Fiyatlarla BİM'de!",
+            "GETİR: Mutluluk Getir! İlk Siparişinize Özel 50 TL Hediye Kampanyası.",
+            "ŞOK MARKETLER: Şok Ucuzluk Başladı, Evinizin İhtiyaçları Cepte Şok'ta!"
         ];
 
-        function otomasyonuCalistir() {
+        // GÜNCELLENEN TAM YAYIN AKIŞI LİSTESİ
+        const YAYIN_AKISI = [
+            { start: "09:00", end: "09:01", title: "Bilgitop TV Açılış / Yayın Akışı", ytId: "M7lc1UVf-VE", duration: 60, jenerik: "Bilgitop TV Başlıyor" },
+            { start: "09:01", end: "09:05", title: "İstiklal Marşı", ytId: "aqz-KE-bpKQ", duration: 240, jenerik: "Bilgitop TV Başlıyor" },
+            { start: "09:05", end: "11:10", title: "Kemal Sunal (Sakar Şakir)", ytId: "YE7VzlLtp-4", duration: 5200, isMovie: true },
+            { start: "11:10", end: "11:12", title: "Bilgitop Kids Başlıyor", ytId: "LXb3EKWsInQ", duration: 120, jenerik: "Bilgitop Kids Başlıyor" },
+            { start: "11:12", end: "11:15", title: "Reklamlar Kuşağı", ytId: "M7lc1UVf-VE", duration: 180, jenerik: "Reklamlar Başlıyor" },
+            { start: "11:15", end: "11:30", title: "Pepee", ytId: "YE7VzlLtp-4", duration: 900, isMovie: true },
+            { start: "11:30", end: "11:45", title: "Canım Kardeşim", ytId: "aqz-KE-bpKQ", duration: 900, isMovie: true },
+            { start: "11:45", end: "12:00", title: "Köstebekgiller", ytId: "LXb3EKWsInQ", duration: 900, isMovie: true },
+            { start: "12:00", end: "12:30", title: "Çocuk Music Kuşağı", ytId: "M7lc1UVf-VE", duration: 1800, jenerik: "Music Baş-Lı-Yor" },
+            { start: "12:30", end: "12:32", title: "Bilgitop Kids Kapanış", ytId: "YE7VzlLtp-4", duration: 120, jenerik: "Reklamlar Başlıyor" },
+            { start: "12:32", end: "12:40", title: "Reklamlar Kuşağı", ytId: "aqz-KE-bpKQ", duration: 480, jenerik: "Reklamlar Başlıyor" },
+            { start: "12:40", end: "13:00", title: "Haberler (A-Haber Kesit)", ytId: "LXb3EKWsInQ", duration: 1200, isMovie: true },
+            { start: "13:00", end: "13:05", title: "Reklamlar Kuşağı", ytId: "M7lc1UVf-VE", duration: 300, jenerik: "Reklamlar Başlıyor" },
+            { start: "13:05", end: "14:00", title: "Eba İlkokul (1.Bölüm)", ytId: "YE7VzlLtp-4", duration: 3300, isMovie: true },
+            { start: "14:00", end: "14:05", title: "Reklamlar Kuşağı", ytId: "aqz-KE-bpKQ", duration: 300, jenerik: "Reklamlar Başlıyor" },
+            { start: "14:05", end: "15:00", title: "Eba Ortaokul (1. Bölüm)", ytId: "LXb3EKWsInQ", duration: 3300, isMovie: true },
+            { start: "15:00", end: "15:05", title: "Reklamlar Kuşağı", ytId: "M7lc1UVf-VE", duration: 300, jenerik: "Reklamlar Başlıyor" },
+            { start: "15:05", end: "16:00", title: "Eba Lise (1.Bölüm)", ytId: "YE7VzlLtp-4", duration: 3300, isMovie: true },
+            { start: "16:00", end: "16:30", title: "Büyük Reklam Kuşağı", ytId: "aqz-KE-bpKQ", duration: 1800, jenerik: "Reklamlar Başlıyor" },
+            { start: "16:30", end: "18:00", title: "Kemal Sunal (Korkusuz Korkak)", ytId: "LXb3EKWsInQ", duration: 5400, isMovie: true },
+            { start: "18:00", end: "20:00", title: "Hit Musicler Kuşağı", ytId: "M7lc1UVf-VE", duration: 7200, jenerik: "Music Baş-Lı-Yor" },
+            { start: "20:00", end: "22:30", title: "Kemal Sunal (Yedi Bela Hüsnü)", ytId: "YE7VzlLtp-4", duration: 9000, isMovie: true },
+            { start: "22:30", end: "23:00", title: "Gece Reklam Kuşağı", ytId: "aqz-KE-bpKQ", duration: 1800, jenerik: "Reklamlar Başlıyor" },
+            { start: "23:00", end: "23:15", title: "Pepee Kuşağı", ytId: "LXb3EKWsInQ", duration: 900, isMovie: true },
+            { start: "23:15", end: "23:30", title: "Canım Kardeşim", ytId: "M7lc1UVf-VE", duration: 900, isMovie: true },
+            { start: "23:30", end: "23:45", title: "Köstebekgiller", ytId: "YE7VzlLtp-4", duration: 900, isMovie: true },
+            { start: "23:45", end: "23:50", title: "Kapanış Reklamları", ytId: "aqz-KE-bpKQ", duration: 300, jenerik: "Reklamlar Bitiyor" },
+            { start: "23:50", end: "23:53", title: "İstiklal Marşı", ytId: "LXb3EKWsInQ", duration: 180 },
+            { start: "23:54", end: "23:59", title: "Bugün Özet & Yarın Yayın Akışı", ytId: "M7lc1UVf-VE", duration: 300, jenerik: "Yayın Akışı" },
+            { start: "23:59", end: "00:00", title: "Kanal Kapanış Ekranı", ytId: "YE7VzlLtp-4", duration: 60 }
+        ];
+
+        function yayiniBaslat() {
+            oynaticiAktif = true;
+            document.getElementById('play-overlay').style.display = 'none';
+            rejiMerkezi();
+        }
+
+        function rejiMerkezi() {
             var simdi = new Date();
-            var dakika = (simdi.getHours() * 60) + simdi.getMinutes();
-            var frame = document.getElementById('tv-frame');
-            var tag = document.getElementById('dizi-tag-box');
-            var ad = document.getElementById('silent-ad-banner');
-            
-            var aktif = YAYIN_AKISLARI.find(p => dakika >= p.start && dakika < p.end);
+            var h = simdi.getHours();
+            var m = simdi.getMinutes();
+            var s = simdi.getSeconds();
+            var toplamSaniye = (h * 3600) + (m * 60) + s;
+            var toplamDakika = (h * 60) + m;
 
-            if (aktif) {
-                // 4. Yeniden başlamaması için kontrol
-                if (frame.src.split('?')[0] !== aktif.url.split('?')[0]) {
-                    // Senkronize başlangıç için start süresini hesapla
-                    var baslangicZamani = (dakika - aktif.start) * 60;
-                    frame.src = aktif.url + "&start=" + baslangicZamani;
-                    document.getElementById('live-program-title').innerText = "Yayında: " + aktif.title;
+            // GECE KAPANIŞ KONTROLÜ (00:00 ile 09:00 arası kanal kapalı)
+            if (toplamDakika < 540) { // 09:00 öncesi
+                document.getElementById('offline-layer').style.display = 'flex';
+                document.getElementById('tv-player').style.display = 'none';
+                document.getElementById('program-tag').style.display = 'none';
+                document.getElementById('mini-ad-box').style.display = 'none';
+                document.getElementById('current-title').innerText = "Kanal Kapalı (Yarın 09:00'da Açılacaktır)";
+                return;
+            } else {
+                document.getElementById('offline-layer').style.display = 'none';
+                document.getElementById('tv-player').style.display = 'block';
+            }
+
+            var aktifProg = null;
+            var aktifIdx = -1;
+
+            for (var i = 0; i < YAYIN_AKISI.length; i++) {
+                var p = YAYIN_AKISI[i];
+                var sParts = p.start.split(":");
+                var eParts = p.end.split(":");
+                var startSec = (parseInt(sParts[0]) * 3600) + (parseInt(sParts[1]) * 60);
+                var endSec = (parseInt(eParts[0]) * 3600) + (parseInt(eParts[1]) * 60);
+
+                if (toplamSaniye >= startSec && toplamSaniye < endSec) {
+                    aktifProg = p;
+                    aktifProg.startInSeconds = startSec;
+                    aktifProg.endInSeconds = endSec;
+                    aktifIdx = i;
+                    break;
                 }
-                
-                tag.style.display = 'block';
-                tag.innerText = aktif.title;
+            }
 
-                // 2. 5 dakikada bir reklam (dakika 5'in katı ise)
-                if (simdi.getMinutes() % 5 === 0) {
-                    ad.style.display = 'block';
-                    ad.innerText = "SPONSOR: Bilgitop Fırsatları";
+            // AKIŞ LİSTESİ UI GÜNCELLEME
+            var uiList = document.getElementById('ui-list');
+            if (uiList.children.length === 0) { // Sadece ilk başta veya değişiklikte yükle
+                YAYIN_AKISI.forEach(function(prog, idx) {
+                    var row = document.createElement('div');
+                    row.className = "schedule-row" + (aktifIdx === idx ? " active" : "");
+                    row.innerHTML = "<span>" + prog.start + " - " + prog.title + "</span><span>" + (aktifIdx === idx ? "● CANLI" : prog.end) + "</span>";
+                    uiList.appendChild(row);
+                });
+            } else {
+                for(let k=0; k<uiList.children.length; k++){
+                    uiList.children[k].className = "schedule-row" + (aktifIdx === k ? " active" : "");
+                    uiList.children[k].children[1].innerText = (aktifIdx === k ? "● CANLI" : YAYIN_AKISI[k].end);
+                }
+            }
+
+            if (aktifProg && oynaticiAktif) {
+                document.getElementById('current-title').innerText = aktifProg.title;
+                
+                var programdaGecenSaniye = toplamSaniye - aktifProg.startInSeconds;
+                var kalanSaniye = aktifProg.endInSeconds - toplamSaniye;
+                var guvenliSaniye = programdaGecenSaniye % aktifProg.duration;
+
+                var logo = document.getElementById('logo-element');
+                var tagBox = document.getElementById('program-tag');
+                var adBox = document.getElementById('mini-ad-box');
+                var jenerikBox = document.getElementById('jenerik-overlay');
+
+                // 🎬 JENERİK VE OVERLAY KONTROLLERİ
+                if (aktifProg.jenerik) {
+                    jenerikBox.style.display = 'block';
+                    jenerikBox.innerText = aktifProg.jenerik;
+                } else if (kalanSaniye <= 60) {
+                    // Programa 1 dakika kala "Az sonra..." uyarısı
+                    var sonraki = YAYIN_AKISI[aktifIdx + 1] || YAYIN_AKISI[0];
+                    jenerikBox.style.display = 'block';
+                    jenerikBox.innerText = "Az sonra " + sonraki.title + " Başlıyor";
+                } else if (programdaGecenSaniye <= 30 && aktifProg.isMovie) {
+                    jenerikBox.style.display = 'block';
+                    jenerikBox.innerText = "Devam Ediyor";
                 } else {
-                    ad.style.display = 'none';
+                    jenerikBox.style.display = 'none';
+                }
+
+                // 🛒 REKLAM VE LOGO ETKİLEŞİM MANTIĞI
+                if (aktifProg.isMovie) {
+                    // Dizi veya Film ise: Her 5 dakikada bir, ilk 30 saniye mini reklam tetiklenir
+                    if (m % 5 === 0 && s < 30) {
+                        // REKLAM AKTİF!
+                        adBox.style.display = 'block';
+                        tagBox.style.display = 'none';       // Dizi ismi gizlenir
+                        logo.classList.add('logo-gri');     // Logo gri olur
+                        
+                        var adTextIndex = h % TÜRK_REKLAMLARI.length;
+                        document.getElementById('ad-text').innerText = TÜRK_REKLAMLARI[adTextIndex];
+                    } else {
+                        // NORMAL FİLM MODU
+                        adBox.style.display = 'none';
+                        tagBox.style.display = 'block';      // Dizi ismi geri gelir
+                        tagBox.innerText = aktifProg.title;
+                        logo.classList.remove('logo-gri');  // Logo renklenir
+                    }
+                } else {
+                    // Reklam veya Jenerik kuşağı ise alt öğeleri temizle
+                    adBox.style.display = 'none';
+                    tagBox.style.display = 'none';
+                    logo.classList.remove('logo-gri');
+                }
+
+                // IFRAME YÜKLEME VE KONTROLÜ
+                if (sonOynatilanId !== aktifProg.ytId) {
+                    sonOynatilanId = aktifProg.ytId;
+                    // Durdurma ve sarma aktif olması için controls=1 yapıldı
+                    document.getElementById('tv-player').src = "https://www.youtube.com/embed/" + aktifProg.ytId + "?autoplay=1&controls=1&modestbranding=1&rel=0&playsinline=1&start=" + guvenliSaniye;
                 }
             }
         }
-        setInterval(otomasyonuCalistir, 1000);
+
+        setInterval(rejiMerkezi, 1000);
     </script>
 </body>
 </html>
